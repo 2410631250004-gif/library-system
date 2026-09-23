@@ -8,9 +8,10 @@
 
     @if($book)
         <ul>
-            <li>Judul: {{ $book['judul'] }}</li>
-            <li>Penulis: {{ $book['penulis'] }}</li>
-            <li>Tahun Terbit: {{ $book['tahun'] }}</li>
+            <li>Judul: {{ $book->title }}</li>
+            <li>Penulis: {{ $book->author }}</li>
+            <li>Tahun Terbit: {{ $book->year }}</li>
+            <li>Stok: {{ $book->stock }}</li>
         </ul>
     @else
         <p>Buku dengan ID tersebut tidak ditemukan.</p>
