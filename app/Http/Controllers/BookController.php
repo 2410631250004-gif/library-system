@@ -7,6 +7,7 @@ use App\Models\Book;
 
 class BookController extends Controller
 {
+    // READ - daftar buku
     public function index()
     {
         $title = 'Daftar Buku';
@@ -16,10 +17,55 @@ class BookController extends Controller
         return view('books.index', compact('title', 'description', 'books'));
     }
 
-    public function show($id)
+    // CREATE - tampilkan form tambah
+    public function create()
     {
-        $book = Book::find($id);
+        return view('books.create');
+    }
 
-        return view('books.show', compact('id', 'book'));
+    // STORE - simpan data baru
+    public function store(Request $request)
+    {
+        Book::create([
+            'title' => $request->title,
+            'author' => $request->author,
+            'year' => $request->year,
+            'stock' => $request->stock,
+        ]);
+
+        return redirect()->route('books.index');
+    }
+
+    // READ - detail buku 
+    public function show(Book $book)
+    {
+        return view('books.show', compact('book'));
+    }
+
+    // UPDATE - tampilkan form edit
+    public function edit(Book $book)
+    {
+        return view('books.edit', compact('book'));
+    }
+
+    // UPDATE - simpan perubahan
+    public function update(Request $request, Book $book)
+    {
+        $book->update([
+            'title' => $request->title,
+            'author' => $request->author,
+            'year' => $request->year,
+            'stock' => $request->stock,
+        ]);
+
+        return redirect()->route('books.index');
+    }
+
+    // DELETE - hapus buku
+    public function destroy(Book $book)
+    {
+        $book->delete();
+
+        return redirect()->route('books.index');
     }
 }
