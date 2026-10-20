@@ -6,6 +6,10 @@
     <h2>{{ $title }}</h2>
     <p>{{ $description }}</p>
 
+    @if(session('success'))
+        <p style="color:green">{{ session('success') }}</p>
+    @endif
+
     <p><a href="{{ route('books.create') }}">+ Tambah Buku</a></p>
 
     <table border="1" cellpadding="6" cellspacing="0">

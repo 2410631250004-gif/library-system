@@ -5,26 +5,41 @@
 @section('content')
     <h2>Edit Buku</h2>
 
-    <form action="{{ route('books.update', $book) }}" method="POST">
+    <form action="{{ route('books.update', $book) }}" method="POST" novalidate>
         @csrf
         @method('PUT')
 
-        <p>
-            <label>Judul</label><br>
-            <input type="text" name="title" value="{{ $book->title }}" required>
-        </p>
-        <p>
+        <div style="margin-bottom:12px">
+            <label>Judul Buku</label><br>
+            <input type="text" name="title" value="{{ old('title', $book->title) }}">
+            @error('title')
+                <p style="color:red; margin:4px 0">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div style="margin-bottom:12px">
             <label>Penulis</label><br>
-            <input type="text" name="author" value="{{ $book->author }}" required>
-        </p>
-        <p>
+            <input type="text" name="author" value="{{ old('author', $book->author) }}">
+            @error('author')
+                <p style="color:red; margin:4px 0">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div style="margin-bottom:12px">
             <label>Tahun Terbit</label><br>
-            <input type="number" name="year" value="{{ $book->year }}" required>
-        </p>
-        <p>
+            <input type="number" name="year" value="{{ old('year', $book->year) }}">
+            @error('year')
+                <p style="color:red; margin:4px 0">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div style="margin-bottom:12px">
             <label>Stok</label><br>
-            <input type="number" name="stock" value="{{ $book->stock }}" required>
-        </p>
+            <input type="number" name="stock" value="{{ old('stock', $book->stock) }}">
+            @error('stock')
+                <p style="color:red; margin:4px 0">{{ $message }}</p>
+            @enderror
+        </div>
 
         <button type="submit">Update</button>
         <a href="{{ route('books.index') }}">Batal</a>

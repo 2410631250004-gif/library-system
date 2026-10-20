@@ -3,10 +3,78 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Book;
 
 class BookController extends Controller
 {
+    // Aturan validasi store() dan update()
+    private function rules(?Book $book = null): array
+    {
+        return [
+            'title' => [
+                'required',
+                'string',
+                'min:3',
+                'max:255',
+                Rule::unique('books', 'title')->ignore($book),
+            ],
+            'author' => [
+                'required',
+                'string',
+                'min:3',
+                'max:255',
+                'regex:/^[\pL\s\.\,\'\-]+$/u',
+            ],
+            'year' => [
+                'required',
+                'integer',
+                'digits:4',
+                'min:1901',
+                'max:' . date('Y'),
+            ],
+            'stock' => [
+                'required',
+                'integer',
+                'min:0',
+                'max:1000',
+            ],
+        ];
+    }
+
+    // Pesan kesalahan 
+    private function messages(): array
+    {
+        return [
+            'required' => ':attribute wajib diisi.',
+            'string'   => ':attribute harus berupa teks.',
+            'integer'  => ':attribute harus berupa bilangan bulat.',
+            'digits'   => ':attribute harus terdiri dari :digits digit.',
+            'unique'   => ':attribute sudah ada di database.',
+            'regex'    => ':attribute hanya boleh berisi huruf, spasi, titik, koma, apostrof, dan tanda hubung.',
+
+        // Pemisahan aturan min & max berdasarkan tipe data
+            'min' => [
+                'numeric' => ':attribute minimal :min.',
+                'string'  => ':attribute minimal :min karakter.',
+            ],
+            'max' => [
+                'numeric' => ':attribute maksimal :max.',
+                'string'  => ':attribute maksimal :max karakter.',
+        ],
+    ];
+}
+
+    private function attributes(): array
+    {
+        return [
+            'title'  => 'Judul buku',
+            'author' => 'Nama penulis',
+            'year'   => 'Tahun terbit',
+            'stock'  => 'Stok',
+        ];
+    }
+
     // READ - daftar buku
     public function index()
     {
@@ -23,20 +91,23 @@ class BookController extends Controller
         return view('books.create');
     }
 
-    // STORE - simpan data baru
+    // STORE - validasi lalu simpan data baru
     public function store(Request $request)
     {
-        Book::create([
-            'title' => $request->title,
-            'author' => $request->author,
-            'year' => $request->year,
-            'stock' => $request->stock,
-        ]);
+        $validated = $request->validate(
+            $this->rules(),
+            $this->messages(),
+            $this->attributes()
+        );
 
-        return redirect()->route('books.index');
+        Book::create($validated);
+
+        return redirect()
+            ->route('books.index')
+            ->with('success', 'Data buku berhasil ditambahkan.');
     }
 
-    // READ - detail buku 
+    // READ - detail buku (Route Model Binding)
     public function show(Book $book)
     {
         return view('books.show', compact('book'));
@@ -48,17 +119,20 @@ class BookController extends Controller
         return view('books.edit', compact('book'));
     }
 
-    // UPDATE - simpan perubahan
+    // UPDATE - validasi lalu simpan perubahan
     public function update(Request $request, Book $book)
     {
-        $book->update([
-            'title' => $request->title,
-            'author' => $request->author,
-            'year' => $request->year,
-            'stock' => $request->stock,
-        ]);
+        $validated = $request->validate(
+            $this->rules($book),
+            $this->messages(),
+            $this->attributes()
+        );
 
-        return redirect()->route('books.index');
+        $book->update($validated);
+
+        return redirect()
+            ->route('books.index')
+            ->with('success', 'Data buku berhasil diperbarui.');
     }
 
     // DELETE - hapus buku
@@ -66,6 +140,8 @@ class BookController extends Controller
     {
         $book->delete();
 
-        return redirect()->route('books.index');
+        return redirect()
+            ->route('books.index')
+            ->with('success', 'Data buku berhasil dihapus.');
     }
 }
