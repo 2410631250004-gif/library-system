@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\Book;
+use App\Models\Category;
 
 class BookController extends Controller
 {
@@ -39,10 +40,14 @@ class BookController extends Controller
                 'min:0',
                 'max:1000',
             ],
+            'category_id' => [
+                'required',
+                'exists:categories,id',
+            ],
         ];
     }
 
-    // Pesan kesalahan 
+    // Pesan kesalahan
     private function messages(): array
     {
         return [
@@ -52,8 +57,9 @@ class BookController extends Controller
             'digits'   => ':attribute harus terdiri dari :digits digit.',
             'unique'   => ':attribute sudah ada di database.',
             'regex'    => ':attribute hanya boleh berisi huruf, spasi, titik, koma, apostrof, dan tanda hubung.',
+            'exists'   => ':attribute yang dipilih tidak valid atau tidak ditemukan.',
 
-        // Pemisahan aturan min & max berdasarkan tipe data
+            // Pemisahan aturan min & max berdasarkan tipe data
             'min' => [
                 'numeric' => ':attribute minimal :min.',
                 'string'  => ':attribute minimal :min karakter.',
@@ -61,34 +67,40 @@ class BookController extends Controller
             'max' => [
                 'numeric' => ':attribute maksimal :max.',
                 'string'  => ':attribute maksimal :max karakter.',
-        ],
-    ];
-}
-
-    private function attributes(): array
-    {
-        return [
-            'title'  => 'Judul buku',
-            'author' => 'Nama penulis',
-            'year'   => 'Tahun terbit',
-            'stock'  => 'Stok',
+            ],
         ];
     }
 
-    // READ - daftar buku
+    // Nama kustom field untuk pesan error
+    private function attributes(): array
+    {
+        return [
+            'title'       => 'Judul buku',
+            'author'      => 'Nama penulis',
+            'year'        => 'Tahun terbit',
+            'stock'       => 'Stok',
+            'category_id' => 'Kategori buku',
+        ];
+    }
+
+    // READ - daftar buku beserta kategorinya
     public function index()
     {
         $title = 'Daftar Buku';
-        $description = 'Daftar buku yang tersedia di perpustakaan.';
-        $books = Book::all();
+        $description = 'Daftar buku beserta kategorinya yang tersedia di perpustakaan.';
+        
+        // Eager loading relasi category
+        $books = Book::with('category')->get();
 
         return view('books.index', compact('title', 'description', 'books'));
     }
 
-    // CREATE - tampilkan form tambah
+    // CREATE - tampilkan form tambah dengan pilihan kategori
     public function create()
     {
-        return view('books.create');
+        $categories = Category::orderBy('name')->get();
+
+        return view('books.create', compact('categories'));
     }
 
     // STORE - validasi lalu simpan data baru
@@ -110,13 +122,17 @@ class BookController extends Controller
     // READ - detail buku (Route Model Binding)
     public function show(Book $book)
     {
+        $book->load('category');
+
         return view('books.show', compact('book'));
     }
 
-    // UPDATE - tampilkan form edit
+    // UPDATE - tampilkan form edit dengan data kategori
     public function edit(Book $book)
     {
-        return view('books.edit', compact('book'));
+        $categories = Category::orderBy('name')->get();
+
+        return view('books.edit', compact('book', 'categories'));
     }
 
     // UPDATE - validasi lalu simpan perubahan
