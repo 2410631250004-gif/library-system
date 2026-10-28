@@ -1,15 +1,22 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\MemberController;
 
-Route::get('/dashboard', [DashboardController::class, 'index']);
+// Redirect halaman utama ke daftar buku atau login
+Route::get('/', function () {
+    return redirect()->route('books.index');
+});
 
-Route::resource('books', BookController::class);
+// Route khusus pengguna yang belum login (guest)
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+});
 
-Route::get('/categories', [CategoryController::class, 'index']);
-
-Route::get('/members', [MemberController::class, 'index']);
+// Route khusus pengguna yang sudah login (auth)
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::resource('books', BookController::class);
+});

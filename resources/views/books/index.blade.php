@@ -3,6 +3,14 @@
 @section('title', $title)
 
 @section('content')
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <p>Selamat datang, <strong>{{ Auth::user()->name ?? 'Pengguna' }}</strong>!</p>
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+
     <h2>{{ $title }}</h2>
     <p>{{ $description }}</p>
 
@@ -11,6 +19,7 @@
     @endif
 
     <p><a href="{{ route('books.create') }}">+ Tambah Buku</a></p>
+
     <table border="1" cellpadding="6" cellspacing="0">
         <tr>
             <th>ID</th>
