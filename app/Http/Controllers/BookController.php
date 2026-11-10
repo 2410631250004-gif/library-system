@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Gate;
 use App\Models\Book;
 use App\Models\Category;
 
@@ -88,7 +89,7 @@ class BookController extends Controller
     {
         $title = 'Daftar Buku';
         $description = 'Daftar buku beserta kategorinya yang tersedia di perpustakaan.';
-        
+
         // Eager loading relasi category
         $books = Book::with('category')->get();
 
@@ -151,9 +152,11 @@ class BookController extends Controller
             ->with('success', 'Data buku berhasil diperbarui.');
     }
 
-    // DELETE - hapus buku
+    // DELETE - hapus buku (dicek dengan BookPolicy)
     public function destroy(Book $book)
     {
+        Gate::authorize('delete', $book);
+
         $book->delete();
 
         return redirect()

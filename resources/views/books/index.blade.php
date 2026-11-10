@@ -11,6 +11,10 @@
         </form>
     </div>
 
+    @can('manage-users')
+        <p><a href="{{ route('users.index') }}">Kelola Pengguna</a></p>
+    @endcan
+
     <h2>{{ $title }}</h2>
     <p>{{ $description }}</p>
 
@@ -40,13 +44,19 @@
                 <td>{{ $book->stock }}</td>
                 <td>
                     <a href="{{ route('books.edit', $book) }}">Edit</a>
-                    <form action="{{ route('books.destroy', $book) }}" method="POST" style="display:inline" onsubmit="return confirm('Yakin hapus buku ini?')">
+
+                     @can('delete', $book)
+                        <form action="{{ route('books.destroy', $book) }}"
+                            method="POST"
+                            style="display:inline"
+                            onsubmit="return confirm('Yakin ingin menghapus buku ini?')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit">Hapus</button>
-                    </form>
+                        <button type="submit">Delete</button>
+                        </form>
+                    @endcan
                 </td>
             </tr>
         @endforeach
     </table>
-@endsection
+@endsection 
