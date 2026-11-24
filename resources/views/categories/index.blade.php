@@ -5,9 +5,18 @@
 @section('content')
     <h2>{{ $title }}</h2>
 
-    <ul>
+    <table border="1" cellpadding="6" cellspacing="0">
+        <tr>
+            <th>ID</th>
+            <th>Nama Kategori</th>
+            <th>Jumlah Buku</th>
+        </tr>
         @foreach($categories as $category)
-            <li>{{ $category }}</li>
+            <tr>
+                <td>{{ $category->id }}</td>
+                <td>{{ $category->name }}</td>
+                <td>{{ $category->books_count }}</td>
+            </tr>
         @endforeach
-    </ul>
+    </table>
 @endsection

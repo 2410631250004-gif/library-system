@@ -9,17 +9,21 @@
     <header>
         <h1>Library System</h1>
         <nav>
-            <a href="{{ route('books.index') }}">Books</a> |
-            <a href="{{ route('categories.index') }}">Categories</a> |
-            <a href="{{ route('members.index') }}">Members</a> |
+            <a href="{{ route('dashboard') }}">Dashboard</a> |
+            <a href="{{ route('categories.index') }}">Kategori</a> |
+            <a href="{{ route('books.index') }}">Buku</a> |
+            <a href="{{ route('members.index') }}">Anggota</a> |
+            <a href="{{ route('borrowings.index') }}">Peminjaman</a>
+
             @can('manage-users')
-                <a href="{{ route('users.index') }}">Kelola Pengguna</a> |
+                | <a href="{{ route('users.index') }}">Pengguna</a>
             @endcan
 
             @auth
-                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                | {{ auth()->user()->name }} ({{ auth()->user()->role }})
+                <form action="{{ route('logout') }}" method="POST" style="display:inline">
                     @csrf
-                    <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">Logout</button>
+                    <button type="submit">Logout</button>
                 </form>
             @endauth
         </nav>
